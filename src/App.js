@@ -1,4 +1,8 @@
-import './App.css';
+import React from 'react';
+
+// Custom components
+import QuizEditor from './components/QuizEditor';
+import QuizList from './components/QuizList';
 
 function App() {
   return (
