@@ -7,6 +7,11 @@ import QuizList from './components/QuizList';
 // Static quiz data imported from a JSON file
 import quizData from './db.json';
 
+// Bootstrap components
+import Container from 'react-bootstrap/Container';
+// Import Bootstrap CSS and optional theme
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 function App() {
   // State to hold the list of quizzes
   const [quizzes, setQuizzes] = useState(quizData);
@@ -46,13 +51,15 @@ function App() {
   }
 
   return (
-    <div>
+    <Container className="App mt-5">
+      <h1 className="text-center mb-4">Quiz Manager</h1>
+
       {/* Render the list of quizzes */}
       <QuizList quizzes={quizzes} onEdit={handleEdit} />
 
       {/* Conditionally render the QuizEditor if there's a currentQuiz set */}
       {currentQuiz && <QuizEditor quiz={currentQuiz} onSave={handleSave} onCancel={handleCancel} />}
-    </div>
+    </Container>
   );
 }
 

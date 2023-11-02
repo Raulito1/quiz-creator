@@ -1,32 +1,41 @@
 import React from 'react';
+import ListGroup from 'react-bootstrap/ListGroup';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
 
 export default function QuizList({ quizzes, onEdit }) {
     return (
         <div>
             {/* Display a title for the list of quizzes */}
-            <h1>Quizzes</h1>
-            <ul>
+            <h2 className="mb-4">Quizzes</h2>
+
+            <ListGroup variant="flush">
                 {/* Map through each quiz in the quizzes array */}
                 {quizzes.map(quiz => (
-                    <li key={quiz.id}>
-                        {/* Display the title of the quiz in bold */}
-                        <strong>{quiz.title}</strong>
-                        {/* Display the description of the quiz */}
-                        <p>{quiz.description}</p>
-                        {/* Display the score of the quiz (assuming quizzes have a score property) */}
-                        <p>{quiz.score}</p>
-                        {/* Display the URL of the quiz */}
-                        <p>{quiz.url}</p>
-                        {/* When clicked, the onEdit callback is invoked with the current quiz as argument */}
-                        <button onClick={() => onEdit(quiz)}>Edit</button>
-                    </li>
+                    <ListGroup.Item key={quiz.id}>
+                        <Card>
+                            <Card.Body>
+                                {/* Display the title of the quiz in bold */}
+                                <Card.Title>{quiz.title}</Card.Title>
+                                {/* Display the description of the quiz */}
+                                <Card.Text>{quiz.description}</Card.Text>
+                                {/* Display the score of the quiz (assuming quizzes have a score property) */}
+                                <Card.Text>Score: {quiz.score}</Card.Text>
+                                {/* Display the URL of the quiz */}
+                                <Card.Text>URL: <a href={quiz.url} target="_blank" rel="noreferrer">{quiz.url}</a></Card.Text>
+                                {/* When clicked, the onEdit callback is invoked with the current quiz as argument */}
+                                <Button variant="primary" onClick={() => onEdit(quiz)}>Edit</Button>
+                            </Card.Body>
+                        </Card>
+                    </ListGroup.Item>
                 ))}
-            </ul>
+            </ListGroup>
+            
             {/* Provide a "Create New Quiz" button.
             When clicked, the onEdit callback is invoked with a null argument
             indicating that a new quiz should be created
              */}
-            <button onClick={() => onEdit(null)}>Create New Quiz</button>
+            <Button className="mt-4" variant="success" onClick={() => onEdit(null)}>Create New Quiz</Button>
         </div>
-    )
+    );
 }
