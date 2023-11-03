@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+
+// Custom hook for managing quiz editor state
+import { useQuizEditor } from '../hooks/useQuizEditor';
 
 // Bootstrap components
 import Form from 'react-bootstrap/Form';
@@ -8,73 +10,16 @@ import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 
 export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
-    // localQuiz keeps track of the quiz data being edited/created in this component.
-    const [localQuiz, setQuiz] = useState(quiz || getNewQuiz());
-
-    // useNavigate hook from react-router-dom to redirect the user after saving/canceling.
-    const navigate = useNavigate();
-
-    // console log quiz
-    console.log(quiz);
-
-    // Returns a new blank quiz object.
-    function getNewQuiz() {
-        return {
-            title: '',
-            description: '',
-            score: '',
-            url: '',
-            questions_answers: [{
-                text: '',
-                answers: [{ text: '', is_true: false }],
-                feedback_false: '',
-                feedback_true: ''
-            }]
-        };
-    }
-
-    // Calls the passed onSave callback with the current state of localQuiz.
-    function handleSave() {
-        // Check if title, description, or url are empty
-        if (!localQuiz.title.trim() || !localQuiz.description.trim() || !localQuiz.url.trim()) {
-            alert('Please fill out all required fields.'); // You can replace this with a more sophisticated validation message or UI indication.
-            return; // Prevent the save operation
-        }
-        onSave(localQuiz);
-        navigate('/'); // Trigger the redirection after saving
-    }
-
-    // Updates the text of a question in localQuiz.
-    const handleQuestionChange = (qIndex, e) => {
-        const newQuestions = [...localQuiz.questions_answers];
-        newQuestions[qIndex].text = e.target.value;
-        setQuiz({ ...localQuiz, questions_answers: newQuestions });
-    };
-
-    // Updates the text of an answer in localQuiz.
-    const handleAnswerChange = (qIndex, aIndex, e) => {
-        const newQuestions = [...localQuiz.questions_answers];
-        newQuestions[qIndex].answers[aIndex].text = e.target.value;
-        setQuiz({ ...localQuiz, questions_answers: newQuestions });
-    };
-
-    // Adds a blank question to localQuiz.
-    function addQuestion() {
-        const newQuestion = {
-            text: '',
-            answers: [{ text: '', is_true: false }],
-            feedback_false: '',
-            feedback_true: ''
-        };
-        setQuiz({ ...localQuiz, questions_answers: [...localQuiz.questions_answers, newQuestion] });
-    }
-
-    // Adds a blank answer to a specific question in localQuiz.
-    function addAnswer(qIndex) {
-        const newQuestions = [...localQuiz.questions_answers];
-        newQuestions[qIndex].answers.push({ text: '', is_true: false });
-        setQuiz({ ...localQuiz, questions_answers: newQuestions });
-    }
+    const {
+        localQuiz,
+        handleSave,
+        setLocalQuiz,
+        handleQuestionChange,
+        handleAnswerChange,
+        addQuestion,
+        addAnswer,
+        navigate
+    } = useQuizEditor(quiz, onSave, onCancel);
 
     return (
         <div>
@@ -88,8 +33,8 @@ export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
                     <Form.Label>Title:</Form.Label>
                     <Form.Control
                         type="text"
-                        value={localQuiz.title}
-                        onChange={e => setQuiz({ ...localQuiz, title: e.target.value })}
+                        value={localQuiz.title || ''}
+                        onChange={e => setLocalQuiz({ ...localQuiz, title: e.target.value })}
                     />
                 </Form.Group>
 
@@ -98,8 +43,8 @@ export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
                     <Form.Label>Description:</Form.Label>
                     <Form.Control
                         type="text"
-                        value={localQuiz.description}
-                        onChange={e => setQuiz({ ...localQuiz, description: e.target.value })}
+                        value={localQuiz.description || ''}
+                        onChange={e => setLocalQuiz({ ...localQuiz, description: e.target.value })}
                     />
                 </Form.Group>
 
@@ -108,8 +53,8 @@ export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
                     <Form.Label>Score:</Form.Label>
                     <Form.Control
                         type="text"
-                        value={localQuiz.score}
-                        onChange={e => setQuiz({ ...localQuiz, score: e.target.value })}
+                        value={localQuiz.score || ''}
+                        onChange={e => setLocalQuiz({ ...localQuiz, score: e.target.value })}
                     />
                 </Form.Group>
 
@@ -118,8 +63,8 @@ export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
                     <Form.Label>Video URL:</Form.Label>
                     <Form.Control
                         type="text"
-                        value={localQuiz.url}
-                        onChange={e => setQuiz({ ...localQuiz, url: e.target.value })}
+                        value={localQuiz.url || ''}
+                        onChange={e => setLocalQuiz({ ...localQuiz, url: e.target.value })}
                         className="mb-3" // Adds margin-bottom with a value of 3
                     />
                 </Form.Group>
@@ -133,7 +78,7 @@ export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
                             <Form.Control
                                 type="text"
                                 value={qa.text}
-                                onChange={e => handleQuestionChange(qIndex, e)}
+                                onChange={e => handleQuestionChange(qIndex, e.target.value)}
                                 className="mb-3"
                             />
                         </Form.Group>
@@ -145,8 +90,8 @@ export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
                                         <Form.Label>Answer {aIndex + 1}:</Form.Label>
                                         <Form.Control
                                             type="text"
-                                            value={answer.text}
-                                            onChange={e => handleAnswerChange(qIndex, aIndex, e)}
+                                            value={answer.text || ''}
+                                            onChange={e => handleAnswerChange(qIndex, aIndex, e.target.value)}
                                         />
                                     </Form.Group>
                                     <Form.Check 
@@ -171,7 +116,7 @@ export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
                                 onChange={e => {
                                     const newQuestions = [...localQuiz.questions_answers];
                                     newQuestions[qIndex].feedback_true = e.target.value;
-                                    setQuiz({ ...localQuiz, questions_answers: newQuestions });
+                                    setLocalQuiz({ ...localQuiz, questions_answers: newQuestions });
                                 }}
                             />
                         </Form.Group>
@@ -184,7 +129,7 @@ export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
                                 onChange={e => {
                                     const newQuestions = [...localQuiz.questions_answers];
                                     newQuestions[qIndex].feedback_false = e.target.value;
-                                    setQuiz({ ...localQuiz, questions_answers: newQuestions });
+                                    setLocalQuiz({ ...localQuiz, questions_answers: newQuestions });
                                 }}
                             />
                         </Form.Group>

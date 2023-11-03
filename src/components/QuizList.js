@@ -34,10 +34,9 @@ export default function QuizList({ quizzes, onEdit, onDelete }) {
                     </ListGroup.Item>
                 ))}
             </ListGroup>
-            <Button className='mt-4' variant='success' onClick={() => {
-                onEdit(null);
-                navigate('/edit-quiz');
-            }}>Create New Quiz</Button>
+            <Button className='mt-4' 
+                variant='success' 
+                onClick={() => {onEdit(null);navigate('/edit-quiz');}}>Create New Quiz</Button>
         </div>
     );
 }
