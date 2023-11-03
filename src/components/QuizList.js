@@ -11,9 +11,9 @@ export default function QuizList({ quizzes, onEdit, onDelete }) {
     
     return (
         <div>
-            <h2 className="mb-4">Quizzes</h2>
+            <h2 className='mb-4'>Quizzes</h2>
 
-            <ListGroup variant="flush">
+            <ListGroup variant='flush'>
                 {quizzes.map(quiz => (
                     <ListGroup.Item key={quiz.id}>
                         <Card>
@@ -22,7 +22,7 @@ export default function QuizList({ quizzes, onEdit, onDelete }) {
                                 <Card.Text>{quiz.description}</Card.Text>
                                 <Card.Text>Score: {quiz.score}</Card.Text>
                                 <Card.Text>URL: <a href={quiz.url} target='_blank' rel='noreferrer'>{quiz.url}</a></Card.Text>
-                                <Button variant="primary"
+                                <Button variant='primary'
                                     className='me-2'
                                     onClick={() => {
                                     onEdit(quiz);
