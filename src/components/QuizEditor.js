@@ -5,15 +5,24 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 
-export default function QuizEditor({ quiz, onSave, onCancel }) {
+import { useNavigate } from 'react-router-dom';
+
+export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
     // localQuiz keeps track of the quiz data being edited/created in this component.
     const [localQuiz, setQuiz] = useState(quiz || getNewQuiz());
+
+    // useNavigate hook from react-router-dom to redirect the user after saving/canceling.
+    const navigate = useNavigate();
+
+    // console log quiz
+    console.log(quiz);
 
     // Returns a new blank quiz object.
     function getNewQuiz() {
         return {
             title: '',
             description: '',
+            score: '',
             url: '',
             questions_answers: [{
                 text: '',
@@ -26,7 +35,13 @@ export default function QuizEditor({ quiz, onSave, onCancel }) {
 
     // Calls the passed onSave callback with the current state of localQuiz.
     function handleSave() {
+        // Check if title, description, or url are empty
+        if (!localQuiz.title.trim() || !localQuiz.description.trim() || !localQuiz.url.trim()) {
+            alert('Please fill out all required fields.'); // You can replace this with a more sophisticated validation message or UI indication.
+            return; // Prevent the save operation
+        }
         onSave(localQuiz);
+        navigate('/'); // Trigger the redirection after saving
     }
 
     // Updates the text of a question in localQuiz.
@@ -64,7 +79,8 @@ export default function QuizEditor({ quiz, onSave, onCancel }) {
     return (
         <div>
             {/* Conditionally display header based on whether editing or creating a quiz */}
-            <h2 className="mb-4">{quiz ? 'Edit Quiz' : 'Add New Quiz'}</h2>
+            <h2 className="mb-4">{isEditing ? 'Edit Quiz' : 'Add New Quiz'}</h2>
+            <h6>{!isEditing ? 'Title, Description & URL are Required *' : ''}</h6>
 
             <Form>
                 {/* Input field for quiz title */}
@@ -87,6 +103,16 @@ export default function QuizEditor({ quiz, onSave, onCancel }) {
                     />
                 </Form.Group>
 
+                 {/* Input field for quiz score */}
+                <Form.Group>
+                    <Form.Label>Score:</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={localQuiz.score}
+                        onChange={e => setQuiz({ ...localQuiz, score: e.target.value })}
+                    />
+                </Form.Group>
+
                 {/* Input field for quiz video URL */}
                 <Form.Group>
                     <Form.Label>Video URL:</Form.Label>
@@ -94,10 +120,11 @@ export default function QuizEditor({ quiz, onSave, onCancel }) {
                         type="text"
                         value={localQuiz.url}
                         onChange={e => setQuiz({ ...localQuiz, url: e.target.value })}
+                        className="mb-3" // Adds margin-bottom with a value of 3
                     />
                 </Form.Group>
-
-                    {/* Display fields for editing/adding questions and their answers */}            {localQuiz.questions_answers && localQuiz.questions_answers.map((qa, qIndex) => (
+                {/* Display fields for editing/adding questions and their answers */}            
+                {localQuiz.questions_answers && localQuiz.questions_answers.map((qa, qIndex) => (
                     <Card className="mb-4" key={qIndex}>
                     <Card.Header>Question {qIndex + 1}</Card.Header>
                     <Card.Body>
@@ -107,6 +134,7 @@ export default function QuizEditor({ quiz, onSave, onCancel }) {
                                 type="text"
                                 value={qa.text}
                                 onChange={e => handleQuestionChange(qIndex, e)}
+                                className="mb-3"
                             />
                         </Form.Group>
 
@@ -161,11 +189,13 @@ export default function QuizEditor({ quiz, onSave, onCancel }) {
                             />
                         </Form.Group>
                     </Card.Body>
-                </Card>
+                    </Card>
                 ))}
-                <Button variant="primary" className="mr-2" onClick={addQuestion}>Add Question</Button>
-                <Button variant="success" className="mr-2" onClick={handleSave}>Save</Button>
-                <Button variant="danger" onClick={onCancel}>Cancel</Button>
+                <div className="pt-3"> {/* pt-3 stands for padding-top with a value of 3 */}
+                    <Button variant="primary" className="me-3" onClick={addQuestion}>Add Question</Button>
+                    <Button variant="success" className="me-3" onClick={handleSave} disabled={!localQuiz.title.trim() || !localQuiz.description.trim() || !localQuiz.url.trim()}>Save</Button>
+                    <Button variant="danger" onClick={() => {onCancel(); navigate('/')}}>Cancel</Button>
+                </div>
             </Form>
         </div>
     );

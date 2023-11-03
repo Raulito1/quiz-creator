@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 // Custom components
 import QuizEditor from './components/QuizEditor';
 import QuizList from './components/QuizList';
@@ -17,19 +17,24 @@ function App() {
   const [quizzes, setQuizzes] = useState(quizData);
   // State to hold the currently selected quiz for editing or a new quiz
   const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [redirectToEdit, setRedirectToEdit] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Handler to set the quiz to be edited. If no quiz is passed, a new empty quiz is set up.
   function handleEdit(quiz) {
     if (quiz) {
       setCurrentQuiz(quiz);
-  } else {
-      setCurrentQuiz({
-          title: '',
-          description: '',
-          url: '',
-          questions_answers: []
-      });
-  }
+      setIsEditing(true);
+    } else {
+        setCurrentQuiz({
+            title: '',
+            description: '',
+            score: '',
+            url: '',
+            questions_answers: []
+        });
+        setIsEditing(false);
+    }
   }
 
   // Handler to save the quiz changes
@@ -43,23 +48,26 @@ function App() {
     }
     // Reset the currentQuiz to null after saving
     setCurrentQuiz(null);
+    setIsEditing(false);
   }
 
   // Handler to cancel editing or creating a new quiz
   function handleCancel() {
     setCurrentQuiz(null);
+    setIsEditing(false);
   }
 
   return (
-    <Container className="App mt-5">
-      <h1 className="text-center mb-4">Quiz Manager</h1>
-
-      {/* Render the list of quizzes */}
-      <QuizList quizzes={quizzes} onEdit={handleEdit} />
-
-      {/* Conditionally render the QuizEditor if there's a currentQuiz set */}
-      {currentQuiz && <QuizEditor quiz={currentQuiz} onSave={handleSave} onCancel={handleCancel} />}
-    </Container>
+    <Router>
+      <Container className="App mt-5">
+        <h1 className="text-center mb-4">Quiz Manager</h1>
+        
+        <Routes>
+          <Route path="/edit-quiz" element={<QuizEditor quiz={currentQuiz} onSave={handleSave} onCancel={handleCancel} isEditing={isEditing} />} />
+          <Route path="/" element={<QuizList quizzes={quizzes} onEdit={handleEdit} redirectToEdit={redirectToEdit} setRedirectToEdit={setRedirectToEdit} />} />
+        </Routes>
+      </Container>
+    </Router>
   );
 }
 
