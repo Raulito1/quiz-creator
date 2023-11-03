@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+// Bootstrap components
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
-
-import { useNavigate } from 'react-router-dom';
 
 export default function QuizEditor({ quiz, onSave, onCancel, isEditing }) {
     // localQuiz keeps track of the quiz data being edited/created in this component.

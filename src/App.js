@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
 // Custom components
 import QuizEditor from './components/QuizEditor';
 import QuizList from './components/QuizList';
@@ -19,6 +20,11 @@ function App() {
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [redirectToEdit, setRedirectToEdit] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Handler to delete a quiz
+  const onDelete = (quizId) => {
+    setQuizzes(quizzes.filter(quiz => quiz.id !== quizId));
+  };
 
   // Handler to set the quiz to be edited. If no quiz is passed, a new empty quiz is set up.
   function handleEdit(quiz) {
@@ -64,7 +70,7 @@ function App() {
         
         <Routes>
           <Route path="/edit-quiz" element={<QuizEditor quiz={currentQuiz} onSave={handleSave} onCancel={handleCancel} isEditing={isEditing} />} />
-          <Route path="/" element={<QuizList quizzes={quizzes} onEdit={handleEdit} redirectToEdit={redirectToEdit} setRedirectToEdit={setRedirectToEdit} />} />
+          <Route path="/" element={<QuizList quizzes={quizzes} onEdit={handleEdit} redirectToEdit={redirectToEdit} setRedirectToEdit={setRedirectToEdit} onDelete={onDelete} />} />
         </Routes>
       </Container>
     </Router>
